@@ -57,6 +57,7 @@
 
 #include "phantom.h"
 #include "networkaccessmanager.h"
+#include "networkproxyfactory.h"
 #include "utils.h"
 #include "config.h"
 #include "consts.h"
@@ -322,6 +323,7 @@ WebPage::WebPage(QObject *parent, const QUrl &baseUrl)
 
     // Custom network access manager to allow traffic monitoring.
     m_networkAccessManager = new NetworkAccessManager(this, phantomCfg);
+    
     m_customWebPage->setNetworkAccessManager(m_networkAccessManager);
     connect(m_networkAccessManager, SIGNAL(resourceRequested(QVariant)),
             SIGNAL(resourceRequested(QVariant)));

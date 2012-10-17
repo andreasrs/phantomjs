@@ -25,7 +25,8 @@ HEADERS += csconverter.h \
     encoding.h \
     config.h \
     repl.h \
-    replcompletable.h
+    replcompletable.h \
+    networkproxyfactory.h
 
 SOURCES += phantom.cpp \
     callback.cpp \
@@ -43,7 +44,8 @@ SOURCES += phantom.cpp \
     encoding.cpp \
     config.cpp \
     repl.cpp \
-    replcompletable.cpp
+    replcompletable.cpp \
+    networkproxyfactory.cpp
 
 OTHER_FILES += \
     bootstrap.js \

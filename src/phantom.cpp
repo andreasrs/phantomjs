@@ -94,28 +94,7 @@ void Phantom::init()
 
     m_page = new WebPage(this, QUrl::fromLocalFile(m_config.scriptFile()));
     m_pages.append(m_page);
-
-    QString proxyType = m_config.proxyType();
-    if (proxyType != "none") {
-        if (m_config.proxyHost().isEmpty()) {
-            QNetworkProxyFactory::setUseSystemConfiguration(true);
-        } else {
-            QNetworkProxy::ProxyType networkProxyType = QNetworkProxy::HttpProxy;
-
-            if (proxyType == "socks5") {
-                networkProxyType = QNetworkProxy::Socks5Proxy;
-            }
-
-            if(!m_config.proxyAuthUser().isEmpty() && !m_config.proxyAuthPass().isEmpty()) {
-                QNetworkProxy proxy(networkProxyType, m_config.proxyHost(), m_config.proxyPort(), m_config.proxyAuthUser(), m_config.proxyAuthPass());
-                QNetworkProxy::setApplicationProxy(proxy);
-            } else {
-                QNetworkProxy proxy(networkProxyType, m_config.proxyHost(), m_config.proxyPort());
-                QNetworkProxy::setApplicationProxy(proxy);
-            }
-        }
-    }
-
+    
     // Set output encoding
     Terminal::instance()->setEncoding(m_config.outputEncoding());
 

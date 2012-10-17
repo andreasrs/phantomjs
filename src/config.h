@@ -57,6 +57,7 @@ class Config: QObject
     Q_PROPERTY(bool printDebugMessages READ printDebugMessages WRITE setPrintDebugMessages)
     Q_PROPERTY(bool javascriptCanOpenWindows READ javascriptCanOpenWindows WRITE setJavascriptCanOpenWindows)
     Q_PROPERTY(bool javascriptCanCloseWindows READ javascriptCanCloseWindows WRITE setJavascriptCanCloseWindows)
+    Q_PROPERTY(QStringList noProxy READ noProxy WRITE setNoProxy)
 
 public:
     Config(QObject *parent = 0);
@@ -108,6 +109,9 @@ public:
     QString proxyAuthPass() const;
     void setProxyAuthUser(const QString &value);
     void setProxyAuthPass(const QString &value);
+
+    QStringList noProxy() const;
+    void setNoProxy(const QStringList& value);
 
     QStringList scriptArgs() const;
     void setScriptArgs(const QStringList &value);
@@ -191,6 +195,7 @@ private:
     bool m_printDebugMessages;
     bool m_javascriptCanOpenWindows;
     bool m_javascriptCanCloseWindows;
+    QStringList m_noProxy;
 };
 
 #endif // CONFIG_H

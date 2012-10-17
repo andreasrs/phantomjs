@@ -38,6 +38,7 @@
 #include <QSet>
 
 class Config;
+class NetworkProxyFactory;
 class QNetworkDiskCache;
 
 class NetworkAccessManager : public QNetworkAccessManager
@@ -73,6 +74,7 @@ private:
     int m_idCounter;
     QNetworkDiskCache* m_networkDiskCache;
     QVariantMap m_customHeaders;
+    NetworkProxyFactory* m_proxyFactory;
 };
 
 #endif // NETWORKACCESSMANAGER_H

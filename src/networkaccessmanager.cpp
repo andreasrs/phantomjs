@@ -40,6 +40,7 @@
 #include "config.h"
 #include "cookiejar.h"
 #include "networkaccessmanager.h"
+#include "networkproxyfactory.h"
 
 static const char *toString(QNetworkAccessManager::Operation op)
 {
@@ -83,6 +84,33 @@ NetworkAccessManager::NetworkAccessManager(QObject *parent, const Config *config
             m_networkDiskCache->setMaximumCacheSize(config->maxDiskCacheSize() * 1024);
         setCache(m_networkDiskCache);
     }
+
+    m_proxyFactory = new NetworkProxyFactory();
+    if (!config->noProxy().empty())
+        m_proxyFactory->setWhiteDomains(config->noProxy());
+
+    QString proxyType = config->proxyType();
+    if (proxyType != "none") {
+        if (config->proxyHost().isEmpty()) {
+            m_proxyFactory->setUseSystemConfiguration(true);            
+        } else {
+            QNetworkProxy::ProxyType networkProxyType = QNetworkProxy::HttpProxy;
+
+            if (proxyType == "socks5") {
+                networkProxyType = QNetworkProxy::Socks5Proxy;
+            }
+
+            if(!config->proxyAuthUser().isEmpty() && !config->proxyAuthPass().isEmpty()) {
+                m_proxyFactory->setProxy(networkProxyType, config->proxyHost(), config->proxyPort(), config->proxyAuthUser(), config->proxyAuthPass());                                
+            } else {
+                m_proxyFactory->setProxy(networkProxyType, config->proxyHost(), config->proxyPort());                
+            }
+        }
+    } else {
+        m_proxyFactory->setUseSystemConfiguration(false);
+    }
+
+    this->setProxyFactory(m_proxyFactory);
 
     connect(this, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), SLOT(provideAuthentication(QNetworkReply*,QAuthenticator*)));
     connect(this, SIGNAL(finished(QNetworkReply*)), SLOT(handleFinished(QNetworkReply*)));
@@ -152,7 +180,7 @@ QNetworkReply *NetworkAccessManager::createRequest(Operation op, const QNetworkR
     if(m_ignoreSslErrors) {
         reply->ignoreSslErrors();
     }
-
+    
     QVariantList headers;
     foreach (QByteArray headerName, req.rawHeaderList()) {
         QVariantMap header;
@@ -211,7 +239,7 @@ void NetworkAccessManager::handleStarted()
 }
 
 void NetworkAccessManager::handleFinished(QNetworkReply *reply)
-{
+{	
     QVariantList headers;
     foreach (QByteArray headerName, reply->rawHeaderList()) {
         QVariantMap header;

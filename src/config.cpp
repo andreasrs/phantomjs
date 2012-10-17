@@ -31,6 +31,7 @@
 
 #include "config.h"
 
+#include <QStringList>	
 #include <QDir>
 #include <QWebPage>
 #include <QWebFrame>
@@ -58,6 +59,7 @@ static const struct QCommandLineConfigEntry flags[] =
     { QCommandLine::Option, '\0', "remote-debugger-port", "Starts the script in a debug harness and listens on the specified port", QCommandLine::Optional },
     { QCommandLine::Option, '\0', "remote-debugger-autorun", "Runs the script in the debugger immediately: 'yes' or 'no' (default)", QCommandLine::Optional },
     { QCommandLine::Option, '\0', "proxy", "Sets the proxy server, e.g. '--proxy=http://proxy.company.com:8080'", QCommandLine::Optional },
+    { QCommandLine::Option, '\0', "no-proxy", "Comma-separated list of hosts which do not use a proxy, if one is specified", QCommandLine::OptionalMultiple },
     { QCommandLine::Option, '\0', "proxy-auth", "Provides authentication information for the proxy, e.g. ''-proxy-auth=username:password'", QCommandLine::Optional },
     { QCommandLine::Option, '\0', "proxy-type", "Specifies the proxy type, 'http' (default), 'none' (disable completely), or 'socks5'", QCommandLine::Optional },
     { QCommandLine::Option, '\0', "script-encoding", "Sets the encoding used for the starting script, default is 'utf8'", QCommandLine::Optional },
@@ -249,20 +251,12 @@ QString Config::proxy() const
 
 void Config::setProxy(const QString &value)
 {
-    QString proxyHost = value;
-    int proxyPort = 1080;
-
-    if (proxyHost.lastIndexOf(':') > 0) {
-        bool ok = true;
-        int port = proxyHost.mid(proxyHost.lastIndexOf(':') + 1).toInt(&ok);
-        if (ok) {
-            proxyHost = proxyHost.left(proxyHost.lastIndexOf(':')).trimmed();
-            proxyPort = port;
-        }
-    }
-
-    setProxyHost(proxyHost);
-    setProxyPort(proxyPort);
+    QUrl proxyUrl = QUrl::fromUserInput(value);
+    if (proxyUrl.isValid()) {
+        setProxyHost(proxyUrl.host());
+        setProxyPort(proxyUrl.port(1080));
+    } else 
+        qDebug() << "Invalid proxy URL";
 }
 
 void Config::setProxyAuth(const QString &value)
@@ -593,6 +587,9 @@ void Config::handleOption(const QString &option, const QVariant &value)
     if (option == "web-security") {
         setWebSecurityEnabled(boolValue);
     }
+    if (option == "no-proxy") {
+        setNoProxy(value.toString().split(','));
+    }
 }
 
 void Config::handleParam(const QString& param, const QVariant &value)
@@ -610,3 +607,12 @@ void Config::handleError(const QString &error)
     setUnknownOption(QString("Error: %1").arg(error));
 }
 
+void Config::setNoProxy(const QStringList& value)
+{
+    m_noProxy = value;
+}
+
+QStringList Config::noProxy() const
+{
+    return m_noProxy;
+}

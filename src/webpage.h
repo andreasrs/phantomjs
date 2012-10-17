@@ -44,6 +44,7 @@ class WebpageCallbacks;
 class NetworkAccessManager;
 class QWebInspector;
 class Phantom;
+class NetworkProxyFactory;
 
 class WebPage: public REPLCompletable, public QWebFrame::PrintCallback
 {
@@ -436,6 +437,7 @@ private:
 private:
     CustomPage *m_customWebPage;
     NetworkAccessManager *m_networkAccessManager;
+    NetworkProxyFactory *m_networkProxyFactory;	
     QWebFrame *m_mainFrame;
     QWebFrame *m_currentFrame;
     QRect m_clipRect;

@@ -44,10 +44,6 @@
 #include "SVGURIReference.h"
 #endif
 
-#if PLATFORM(QT)
-#include <QFontInfo>
-#endif
-
 namespace WebCore {
 
 CSSFontFaceSource::CSSFontFaceSource(const String& str, CachedFont* font)
@@ -113,15 +109,6 @@ SimpleFontData* CSSFontFaceSource::getFontData(const FontDescription& fontDescri
     if (!m_font) {
 #endif
         SimpleFontData* fontData = fontCache()->getCachedFontData(fontDescription, m_string);
-
-#if PLATFORM(QT)
-        QFont font=fontData->getQtFont();
-        QFontInfo fontInfo(font);
-        if(font.family() != fontInfo.family()){
-            // did not get a exact match for a src local name
-            return 0;
-        }
-#endif
 
         // We're local. Just return a SimpleFontData from the normal cache.
         return fontData;
